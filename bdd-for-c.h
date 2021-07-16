@@ -31,6 +31,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <float.h>
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -656,6 +657,93 @@ for(\
 #define __BDD_CHECK_ONE__(condition) __BDD_CHECK__(condition, #condition)
 
 #define check(...) __BDD_MACRO__(__BDD_CHECK_, __VA_ARGS__)
+
+
+// expect syntax helper functions
+static bool __bddx_loopflag;
+#define __BDDX_WRAPPER() for (__bddx_loopflag = true; \
+    __bddx_loopflag; \
+    __bddx_loopflag = false)
+
+#define __BDDX_DEFINE(define) for (define; __bddx_loopflag; __bddx_loopflag = false)
+#define __BDDX_DEFINE_OP(op, opname, opname_str) __BDDX_DEFINE(typeof(op) opname = (op)) \
+    __BDDX_DEFINE(const char *opname_str = #op)
+#define __BDDX_BEFORE(before) for (; __bddx_loopflag && (before, true); __bddx_loopflag = false)
+#define __BDDX_AFTER(after) for (; __bddx_loopflag; __bddx_loopflag = false, after)
+
+#define __BDDX_GENERIC_STR(pre, x, post) _Generic((x), \
+    char: pre "%c" post, \
+    signed char: pre "%hhd" post, \
+    unsigned char: pre "%hhu" post, \
+    signed short: pre "%hd" post, \
+    unsigned short: pre "%hu" post, \
+    signed int: pre "%d" post, \
+    unsigned int: pre "%u" post, \
+    long int: pre "%ld" post, \
+    unsigned long int: pre "%lu" post, \
+    long long int: pre "%lld" post, \
+    unsigned long long int: pre "%llu" post, \
+    float: pre "%f" post, \
+    double: pre "%f" post, \
+    long double: pre "%Lf" post, \
+    char *: pre "%s" post, \
+    void *: pre "%p" post)
+
+#define __BDDX_DO_CHECK(cmp, checkfmt, ...) check((cmp) != __inv, \
+    __BDDX_GENERIC_STR("expected %s (", __act, ") %s" checkfmt), \
+    __acts, \
+    __act, \
+    __inv ? "not " : "", \
+    __VA_ARGS__)
+
+
+// expector
+#define expect(actual) __BDDX_WRAPPER() \
+    __BDDX_DEFINE_OP(actual, __act, __acts) \
+    __BDDX_DEFINE(bool __inv = false)
+
+// basic matchers
+#define not __BDDX_WRAPPER() \
+    __BDDX_BEFORE(__inv = !__inv)
+
+#define to_be(expected) __BDDX_WRAPPER() \
+    __BDDX_DEFINE_OP(expected, __exp, __exps) \
+    __BDDX_DO_CHECK(__act == __exp, "to be %s", __exps)
+
+// boolean matchers
+#define to_be_true() __BDDX_WRAPPER() \
+    __BDDX_DEFINE_OP(true, __exp, __exps) \
+    __BDDX_DO_CHECK(__act == __exp, "to be true", NULL)
+
+#define to_be_false() __BDDX_WRAPPER() \
+    __BDDX_DEFINE_OP(false, __exp, __exps) \
+    __BDDX_DO_CHECK(__act == __exp, "to be false", NULL)
+
+#define to_be_null() __BDDX_WRAPPER() \
+    __BDDX_DEFINE_OP(NULL, __exp, __exps) \
+    __BDDX_DO_CHECK(__act == __exp, "to be NULL", NULL)
+
+// number matchers
+#define to_be_greater_than(expected) __BDDX_WRAPPER() \
+    __BDDX_DEFINE_OP(expected, __exp, __exps) \
+    __BDDX_DO_CHECK(__act > __exp, "to be greater than %s", __exps)
+
+#define to_be_greater_than_or_equal(expected) __BDDX_WRAPPER() \
+    __BDDX_DEFINE_OP(expected, __exp, __exps) \
+    __BDDX_DO_CHECK(__act >= __exp, "to be greater than or equal to %s", __exps)
+
+#define to_be_less_than(expected) __BDDX_WRAPPER() \
+    __BDDX_DEFINE_OP(expected, __exp, __exps) \
+    __BDDX_DO_CHECK(__act < __exp, "to be less than %s", __exps)
+
+#define to_be_less_than_or_equal(expected) __BDDX_WRAPPER() \
+    __BDDX_DEFINE_OP(expected, __exp, __exps) \
+    __BDDX_DO_CHECK(__act <= __exp, "to be less than or equal to %s", __exps)
+
+#define __fltdt (FLT_EPSILON * 100)
+#define to_approach(expected) __BDDX_WRAPPER() \
+    __BDDX_DEFINE_OP(expected, __exp, __exps) \
+    __BDDX_DO_CHECK(__act >= __exp - __fltdt && __act <= __exp + __fltdt, "to approach %s", __exps)
 
 #ifdef _MSC_VER
 #pragma warning(pop)
