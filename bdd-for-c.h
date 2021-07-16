@@ -51,6 +51,12 @@ SOFTWARE.
 #pragma warning(disable: 4996) // _CRT_SECURE_NO_WARNINGS
 #endif
 
+#ifndef typeof
+#define typeof __typeof__
+#endif
+
+int fileno(FILE *stream);
+
 #ifndef BDD_USE_COLOR
 #define BDD_USE_COLOR 1
 #endif
