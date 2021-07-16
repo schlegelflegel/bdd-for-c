@@ -720,7 +720,7 @@ static bool __bddx_loopflag;
             char *: strncmp((char *) (uintptr_t) __act, (char *) (uintptr_t) __exp, n) == 0, \
             default: __act == __exp), \
         "to be %s", __exps)
-#define to_be(expected, ...) _to_be(expected, ## __VA_ARGS__, SIZE_MAX)
+#define to_be(expected, ...) _to_be(expected, ## __VA_ARGS__, (SIZE_MAX / 2))
 
 // boolean matchers
 #define to_be_true() __BDDX_WRAPPER() \
