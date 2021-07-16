@@ -712,15 +712,15 @@ static bool __bddx_loopflag;
 #define not __BDDX_WRAPPER() \
     __BDDX_BEFORE(__inv = !__inv)
 
-#define _to_be(expected, n, ...) __BDDX_WRAPPER() \
+#define __bddx_strcmp(a, b) strcmp((char *) (uintptr_t) a, (char *) (uintptr_t) b)
+#define to_be(expected) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
     __BDDX_DO_CHECK( \
         _Generic(__act, \
-            const char *: strncmp((char *) (uintptr_t) __act, (char *) (uintptr_t) __exp, n) == 0, \
-            char *: strncmp((char *) (uintptr_t) __act, (char *) (uintptr_t) __exp, n) == 0, \
+            const char *: __bddx_strcmp(__act, __exp) == 0, \
+            char *: __bddx_strcmp(__act, __exp) == 0, \
             default: __act == __exp), \
         "to be %s", __exps)
-#define to_be(expected, ...) _to_be(expected, ## __VA_ARGS__, (SIZE_MAX / 2))
 
 // boolean matchers
 #define to_be_true() __BDDX_WRAPPER() \

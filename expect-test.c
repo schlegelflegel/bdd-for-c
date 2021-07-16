@@ -59,7 +59,6 @@ spec("bdd-for-c expect") {
         it("should compare strings") {
             expect(str1) to_be("hello");
             expect(str1) not to_be("world");
-            expect(str1) to_be("hell no", 4); // limit to 4 characters
         }
     }
 
