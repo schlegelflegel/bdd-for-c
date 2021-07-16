@@ -31,6 +31,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <float.h>
 
 #ifndef _WIN32
@@ -687,7 +688,9 @@ static bool __bddx_loopflag;
     double: pre "%f" post, \
     long double: pre "%Lf" post, \
     char *: pre "%s" post, \
+    const char *: pre "%s" post, \
     void *: pre "%p" post, \
+    const void *: pre "%p" post, \
     default: pre "%p" post)
 
 #define __BDDX_CONCAT(a, b) a ## b
@@ -709,9 +712,15 @@ static bool __bddx_loopflag;
 #define not __BDDX_WRAPPER() \
     __BDDX_BEFORE(__inv = !__inv)
 
-#define to_be(expected) __BDDX_WRAPPER() \
+#define _to_be(expected, n, ...) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
-    __BDDX_DO_CHECK(__act == __exp, "to be %s", __exps)
+    __BDDX_DO_CHECK( \
+        _Generic(__act, \
+            const char *: strncmp((char *) (uintptr_t) __act, (char *) (uintptr_t) __exp, n) == 0, \
+            char *: strncmp((char *) (uintptr_t) __act, (char *) (uintptr_t) __exp, n) == 0, \
+            default: __act == __exp), \
+        "to be %s", __exps)
+#define to_be(expected, ...) _to_be(expected, ## __VA_ARGS__, SIZE_MAX)
 
 // boolean matchers
 #define to_be_true() __BDDX_WRAPPER() \
@@ -726,12 +735,12 @@ static bool __bddx_loopflag;
     __BDDX_DEFINE_OP(NULL, __exp, __exps) \
     __BDDX_DO_CHECK(__act == __exp, "to be NULL", NULL)
 
-// number matchers
+// inequality matchers
 #define to_be_greater_than(expected) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
     __BDDX_DO_CHECK(__act > __exp, "to be greater than %s", __exps)
 
-#define to_be_greater_than_or_equal(expected) __BDDX_WRAPPER() \
+#define to_be_greater_than_or_equal_to(expected) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
     __BDDX_DO_CHECK(__act >= __exp, "to be greater than or equal to %s", __exps)
 
@@ -739,7 +748,7 @@ static bool __bddx_loopflag;
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
     __BDDX_DO_CHECK(__act < __exp, "to be less than %s", __exps)
 
-#define to_be_less_than_or_equal(expected) __BDDX_WRAPPER() \
+#define to_be_less_than_or_equal_to(expected) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
     __BDDX_DO_CHECK(__act <= __exp, "to be less than or equal to %s", __exps)
 

@@ -18,10 +18,11 @@ int increment_and_return(int *x) {
 }
 
 spec("bdd-for-c expect") {
-    static example_enum e1, e2, *e1_ptr;
-    
+    static example_enum e1, e2, *e1_ptr;    
     static int counter;
-    static int numbers[10];
+
+    static const int numbers[] = { 0, 1, 2, 3 };
+    static const char *str1 = "hello";
 
     before_each() {
         e1 = state1;
@@ -29,7 +30,6 @@ spec("bdd-for-c expect") {
         e1_ptr = &e1;
 
         counter = 0;
-        for (int i = 0; i < 10; i++) numbers[i] = i;
     }
 
     describe("to_be matcher") {
@@ -48,18 +48,18 @@ spec("bdd-for-c expect") {
         it("should work for static expressions") {
             expect(1 + 2) to_be(3);
             expect(sum(1, 2)) to_be(3);
-            expect(numbers[4]) to_be(4);
+            expect(numbers[2]) to_be(2);
         }
 
         it("should work for dynamic expressions") {
             expect(increment_and_return(&counter)) to_be(1);
             expect(increment_and_return(&counter)) to_be(2);
         }
-    }
 
-    describe("not matcher") {
-        it("should work on any matcher") {
-            expect(0) not to_be(1);
+        it("should compare strings") {
+            expect(str1) to_be("hello");
+            expect(str1) not to_be("world");
+            expect(str1) to_be("hell no", 4); // limit to 4 characters
         }
     }
 
@@ -70,8 +70,8 @@ spec("bdd-for-c expect") {
         }
 
         it("should work on <=") {
-            expect(0) to_be_less_than_or_equal(0);
-            expect(0) not to_be_less_than_or_equal(-1);
+            expect(0) to_be_less_than_or_equal_to(0);
+            expect(0) not to_be_less_than_or_equal_to(-1);
         }
 
         it("should work on >") {
@@ -80,12 +80,12 @@ spec("bdd-for-c expect") {
         }
 
         it("should work on >=") {
-            expect(0) to_be_greater_than_or_equal(0);
-            expect(0) not to_be_greater_than_or_equal(1);
+            expect(0) to_be_greater_than_or_equal_to(0);
+            expect(0) not to_be_greater_than_or_equal_to(1);
         }
     }
 
-    describe("approach matcher") {
+    describe("to_be_close_to matcher") {
         it("should work for static expressions") {
             expect(1.0f - 0.4f) to_be_close_to(0.6f);
             expect(0.6000001f) to_be_close_to(0.6f);
