@@ -2,6 +2,12 @@
 
 The `bdd-for-c` library is a [BDD][bdd] test framework for the [C language][c].
 
+## Fork by Schlegel Flegel
+
+This fork implements a handful of matcher functions using the `expect` syntax (see https://jestjs.io/docs/expect).
+
+Detailed usage information will follow.
+
 
 ## Quick Start
 
