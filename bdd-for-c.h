@@ -687,7 +687,10 @@ static bool __bddx_loopflag;
     double: pre "%f" post, \
     long double: pre "%Lf" post, \
     char *: pre "%s" post, \
-    void *: pre "%p" post)
+    void *: pre "%p" post, \
+    default: pre "%p" post)
+
+#define __BDDX_CONCAT(a, b) a ## b
 
 #define __BDDX_DO_CHECK(cmp, checkfmt, ...) check((cmp) != __inv, \
     __BDDX_GENERIC_STR("expected %s (", __act, ") %s" checkfmt), \
@@ -740,10 +743,10 @@ static bool __bddx_loopflag;
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
     __BDDX_DO_CHECK(__act <= __exp, "to be less than or equal to %s", __exps)
 
-#define __fltdt (FLT_EPSILON * 100)
-#define to_approach(expected) __BDDX_WRAPPER() \
+#define __to_be_close_to(expected, epsilon, ...) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
-    __BDDX_DO_CHECK(__act >= __exp - __fltdt && __act <= __exp + __fltdt, "to approach %s", __exps)
+    __BDDX_DO_CHECK(__act >= __exp - epsilon && __act <= __exp + epsilon, "to approach %s", __exps)
+#define to_be_close_to(expected, ...) __to_be_close_to(expected, ## __VA_ARGS__, (FLT_EPSILON * 100))
 
 #ifdef _MSC_VER
 #pragma warning(pop)

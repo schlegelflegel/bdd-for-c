@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(bdd)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c99 -W -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c11 -W -Wall")
 
 set(EXAMPLE_SOURCES example.c bdd-for-c.h)
 add_executable(example_test ${EXAMPLE_SOURCES})
@@ -17,3 +17,6 @@ add_executable(dynamic_test ${DYNAMIC_TEST_SOURCES})
 
 set(BEFORE_AFTER_SOURCES before-after.c bdd-for-c.h)
 add_executable(before_after ${BEFORE_AFTER_SOURCES})
+
+set(EXPECT_TEST_SOURCES expect-test.c bdd-for-c.h)
+add_executable(expect_test ${EXPECT_TEST_SOURCES})
