@@ -396,7 +396,9 @@ void __bdd_run__(__bdd_config_type__ *config) {
         // even if the test itself crashes.
         if ((!skipped || !config->has_focus_nodes) && config->run == __BDD_TEST_RUN__ && !config->use_tap) {
           __bdd_indent__(stdout, step->level);
-          printf("%s ", step->name);
+          printf("%s %s ",
+            config->use_color ? __BDD_COLOR_BOLD__ "it" __BDD_COLOR_RESET__ : "it",
+            step->name);
         }
 
         if (!skipped) {
