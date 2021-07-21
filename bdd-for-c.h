@@ -732,15 +732,15 @@ static bool __bddx_loopflag;
 
 // boolean matchers
 #define to_be_true() __BDDX_WRAPPER() \
-    __BDDX_DEFINE_OP(true, __exp, __exps) \
+    __BDDX_DEFINE(bool __exp = true) \
     __BDDX_DO_CHECK((__act) == (typeof(__act)) (__exp), "to be true", NULL)
 
 #define to_be_false() __BDDX_WRAPPER() \
-    __BDDX_DEFINE_OP(false, __exp, __exps) \
+    __BDDX_DEFINE(bool __exp = false) \
     __BDDX_DO_CHECK((__act) == (typeof(__act)) (__exp), "to be false", NULL)
 
 #define to_be_null() __BDDX_WRAPPER() \
-    __BDDX_DEFINE_OP(NULL, __exp, __exps) \
+    __BDDX_DEFINE(void *__exp = NULL) \
     __BDDX_DO_CHECK((__act) == (typeof(__act)) (__exp), "to be NULL", NULL)
 
 // inequality matchers
