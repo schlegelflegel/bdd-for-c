@@ -720,49 +720,49 @@ static bool __bddx_loopflag;
 #define not __BDDX_WRAPPER() \
     __BDDX_BEFORE(__inv = !__inv)
 
-#define __bddx_strcmp(a, b) strcmp((char *) (uintptr_t) a, (char *) (uintptr_t) b)
+#define __bddx_strcmp(a, b) strcmp((char *) (uintptr_t) (a), (char *) (uintptr_t) (b))
 #define to_be(expected) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
     __BDDX_DO_CHECK( \
         _Generic(__act, \
             const char *: __bddx_strcmp(__act, __exp) == 0, \
             char *: __bddx_strcmp(__act, __exp) == 0, \
-            default: __act == __exp), \
-        "to be %s", __exps)
+            default: (__act) == (typeof(__act)) (__exp)), \
+        "to be %s", (__exps))
 
 // boolean matchers
 #define to_be_true() __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(true, __exp, __exps) \
-    __BDDX_DO_CHECK(__act == __exp, "to be true", NULL)
+    __BDDX_DO_CHECK((__act) == (typeof(__act)) (__exp), "to be true", NULL)
 
 #define to_be_false() __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(false, __exp, __exps) \
-    __BDDX_DO_CHECK(__act == __exp, "to be false", NULL)
+    __BDDX_DO_CHECK((__act) == (typeof(__act)) (__exp), "to be false", NULL)
 
 #define to_be_null() __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(NULL, __exp, __exps) \
-    __BDDX_DO_CHECK(__act == __exp, "to be NULL", NULL)
+    __BDDX_DO_CHECK((__act) == (typeof(__act)) (__exp), "to be NULL", NULL)
 
 // inequality matchers
 #define to_be_greater_than(expected) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
-    __BDDX_DO_CHECK(__act > __exp, "to be greater than %s", __exps)
+    __BDDX_DO_CHECK((__act) > (typeof(__act)) (__exp), "to be greater than %s", __exps)
 
 #define to_be_greater_than_or_equal_to(expected) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
-    __BDDX_DO_CHECK(__act >= __exp, "to be greater than or equal to %s", __exps)
+    __BDDX_DO_CHECK((__act) >= (typeof(__act)) (__exp), "to be greater than or equal to %s", __exps)
 
 #define to_be_less_than(expected) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
-    __BDDX_DO_CHECK(__act < __exp, "to be less than %s", __exps)
+    __BDDX_DO_CHECK((__act) < (typeof(__act)) (__exp), "to be less than %s", __exps)
 
 #define to_be_less_than_or_equal_to(expected) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
-    __BDDX_DO_CHECK(__act <= __exp, "to be less than or equal to %s", __exps)
+    __BDDX_DO_CHECK((__act) <= (typeof(__act)) (__exp), "to be less than or equal to %s", __exps)
 
 #define __to_be_close_to(expected, epsilon, ...) __BDDX_WRAPPER() \
     __BDDX_DEFINE_OP(expected, __exp, __exps) \
-    __BDDX_DO_CHECK(__act >= __exp - epsilon && __act <= __exp + epsilon, "to approach %s", __exps)
+    __BDDX_DO_CHECK((__act) >= (typeof(__act)) (__exp) - (typeof(__act)) (epsilon) && (__act) <= (typeof(__act)) (__exp) + (typeof(__act)) (epsilon), "to approach %s", __exps)
 #define to_be_close_to(expected, ...) __to_be_close_to(expected, ## __VA_ARGS__, (FLT_EPSILON * 100))
 
 #ifdef _MSC_VER
